@@ -1,15 +1,25 @@
+## 🌐 Cost Majority Cascade - Progetto Reti Sociali
 
-## 🌐 Progetto Reti Sociali
---------
-Scelto un grafo G=(V,E), un intero k, una funzione costi c: V->N
-- Determinare il seed set massimale S con c(S) <= k.
-- Si fa girare il processo di attivazione e si determina l’insieme dei nodi attivati Inf[S].
-- Rappresentare con grafici i risultati ottenuti 
+### Introduzione
+Il progetto tratta un processo di diffusione in una rete pesata combinando tre algoritmi di spreading, molteplici funzioni di costo e threshold differenti.
+
+**Il problema**
+
+Scelto un grafo G=(V,E), un intero k come soglia, una funzione costi c: V->N, partito il processo di diffuzione vengono determinate le seguenti: 
+- il seed set massimale S con costo c(S) <= k
+- l’insieme dei nodi attivati Inf[S]
+- i grafici mostranti i risultati ottenuti 
     - per ogni fissata funzione costi c: V->N
-    - al variare del costo budget k del seed set S devono essere rappresentati i valori di |Inf[S]| per diversi algoritmi di selezione del seed set S.
+    - al variare del budget k del seed set S, i valori di |Inf[S]| per diversi algoritmi di selezione.
 
-Le funzione costi da utilizzare devono essere tre per ogni:
+Vengono utilizzate tre funzioni costo:
 - c(u) = valore random scelto in un fissato range
 - c(u) = |d(u)/2|
-- una funzione costi che si ritiene adatta
+- una funzione costi che si ritiene adatta (?)
 
+### Dataset utilizzato
+
+### Installazione
+
+
+### Esecuzione
