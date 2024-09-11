@@ -14,7 +14,7 @@ import math
 import networkx as nx
 import random
 
-# crea il grafo della rete sociale
+# crea il grafo dalla rete sociale
 def create_graph(cost_func):
     # parametri: tipo di grafo da generare, file rete, colonna source vertex
     # colonna destination vertex, separatore
@@ -35,11 +35,29 @@ def create_graph(cost_func):
         random.seed(14)
         COSTS = {node: random.randint(1, 10) for node in nx_graph.nodes()}
     elif cost_func == 1: # degree\2
-        COSTS = {node: Graph_nx.degree(node)/2 for node in Graph_nx.nodes()}
+        COSTS = {node: nx_graph.degree(node)/2 for node in nx_graph.nodes()}
     elif cost_func == 2: # pagerank 
-        "You're too young to party"
+        break
 
     return nx_graph, COSTS
+
+
+# funzione obiettivo f1
+def objective_function(graph, S, u):
+    S_with_u = S | {u} # seed set con u
+    total_with_u = 0
+    total = 0
+    # calcolo valore con u
+    for v in graph.nodes():
+        # applicazione minimo su intersezione tra N ed S e grado/2
+        min_neighbors_in_S_with_u = min(len(set(graph.neighbors(v)) & S_with_u), math.ceil(graph.degree(v) / 2))
+        total_with_u += min_neighbors_in_S_with_u
+    # calcolo valore senza u
+    for v in graph.nodes():
+        min_neighbors_in_S = min(len(set(graph.neighbors(v)) & S), math.ceil(graph.degree(v) / 2))
+        total += min_neighbors_in_S
+    # differenza di incremento
+    return total_with_u - total
 
 
 # algoritmo cost seeds greedy
@@ -47,38 +65,39 @@ def cost_seeds_greedy(graph, costs, budget):
     graph_set = set(graph.nodes())
     Sp = set()
     Sd = set()
-    print(sorted(setGrafo, key=lambda v: delta_v_fi(graph, Sd, v) / costs[v]))
+    discard = set()
     used_budget = 0
     while True:
         try:
-            delta_value = delta_v_fi(graph, Sd, u)
-            u = max(graph_set - Sd, key=lambda v: delta_value / costs[v])
-            if delta_value <= 0:
+            u = max(graph_set - Sd, key=lambda v:  objective_function(graph, Sd, v) / costs[v])
+            if objective_function(graph, Sd, u) <= 0:
                 break
             if sum(costs[v] for v in Sd) + costs[u] <= budget:
                 Sp = Sd
                 Sd = Sp.union({u})
                 budget_used += costs[u]
-                print("Budget utilizzato:", budget_used)
+                print("Budget usato:", budget_used)
                 if budget_used == budget:
                     break
-                print(Sd)
+                # print(Sd)
             else:
-                # nodi scartati
-                discard = set()
+                # nodi scartati dal seed set
                 discard.add(u)
                 graph_set = graph_set - discard
         except:
             break
-    return Sd # seed set iniziale risultante
+    return Sd # seed set risultante
 
 
 # main function
 def main():
     budget = 100
+    print("Budget: " + str(budget))
+    
     GRAPH, COSTS = create_graph(0)
     SEED_SET = cost_seeds_greedy(GRAPH, COSTS, budget)
-    print(SEED_SET)
+    
+    print("seed set selezionato: ", SEED_SET)
 
 
 if __name__=="__main__":
