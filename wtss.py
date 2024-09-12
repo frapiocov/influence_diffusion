@@ -1,11 +1,6 @@
 '''
 Algoritmo Weighted Target Set Selection
 
-Funzione costi
-1. random
-2. metà grafo
-3. pagerank
-
 '''
 import snap
 import math
@@ -13,42 +8,10 @@ import networkx as nx
 import random
 from collections import Counter
 
-
-# crea il grafo dalla rete sociale
-def create_graph(cost_func):
-    # parametri: tipo di grafo da generare, file rete, colonna source vertex
-    # colonna destination vertex, separatore
-    net_graph = snap.LoadEdgeList(snap.TUNGraph, "data/musae_git_edges.csv", 0, 1, ",")
-    # creazione grafo vuoto con networkx 
-    nx_graph = nx.Graph()
-
-    # print(net_graph.GetEdges())
-    # print(net_graph.GetNodes())
-    # riempimento grafo
-    for edge in net_graph.Edges():
-        nx_graph.add_edge(edge.GetSrcNId(), edge.GetDstNId())
-
-    # assegnazione costi in base alla funzione scelta
-    COSTS = {}
-
-    if cost_func == 0: # random
-        random.seed(14)
-        COSTS = {node: random.randint(1, 10) for node in nx_graph.nodes()}
-    elif cost_func == 1: # degree\2
-        COSTS = {node: nx_graph.degree(node)/2 for node in nx_graph.nodes()}
-    elif cost_func == 2: # pagerank 
-        break
-
-    # assegnazione soglie
-    TRESHOLDS = {node: nx_graph.degree(node)/2 for node in nx_graph.nodes()}
-    
-    return nx_graph, COSTS, TRESHOLDS
-
-
 def wtss(GRAPH, COSTS, TRESHOLDS, budget):
     # copia del grafo su cui effettuare il processo
     graph_copy = GRAPH;
-    seed_set = set()
+    seed_set = []
     seed_set_cost = 0
 
     while len(graph_copy.nodes()) > 0:
@@ -78,7 +41,7 @@ def wtss(GRAPH, COSTS, TRESHOLDS, budget):
             if graph_copy.degree(v) < TRESHOLDS[v]:
                 second_case_flag = True
                 # v viene aggiunto al seed set
-                seed_set.add(v)
+                seed_set.append(v)
                 # aggiornato il budget usato
                 seed_set_cost += COSTS[v]
                 
@@ -103,25 +66,11 @@ def wtss(GRAPH, COSTS, TRESHOLDS, budget):
             degree = graph_copy.degree(v)
 
             selected_nodes[v] = ((cost * threshold) / (degree * (degree + 1)))
+        #scelta del nodo da rimuovere
         to_delete = max(selected_nodes, key=selected_nodes.get)
         graph_copy.remove_node(to_delete)
         
         if seed_set_cost >= budget:
-            return seed_set
+            return seed_set[:-1]
 
     return seed_set
-
-
-# main function
-def main():
-    budget = 100
-    print("Budget: " + str(budget))
-    
-    GRAPH, COSTS, TRESHOLDS = create_graph(0)
-    SEED_SET = wtss(GRAPH, COSTS, TRESHOLDS, budget)
-    
-    print("seed set selezionato: ", SEED_SET)
-
-
-if __name__=="__main__":
-    main()
