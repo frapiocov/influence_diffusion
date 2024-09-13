@@ -25,6 +25,7 @@ def my_seeds(graph, costs, budget):
             break
         # aggiunto al seed set
         seed_set.add(v)
+        
         used_budget += costs[v]
         print("Budget utilizzato:", used_budget)
     # seed set risultante

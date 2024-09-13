@@ -14,6 +14,7 @@ import snap
 import math
 import networkx as nx
 import random
+import pandas as pd
 
 from my_seeds import my_seeds
 from cost_seeds_greedy import cost_seeds_greedy
@@ -23,15 +24,18 @@ from wtss import wtss
 def create_graph(cost_func, is_wtss):
     # parametri: tipo di grafo da generare, file rete, colonna source vertex
     # colonna destination vertex, separatore
-    net_graph = snap.LoadEdgeList(snap.TUNGraph, "data/github_social_network.csv", 0, 1, ",")
+    net_df = pd.read_csv("data/soc-sign-bitcoinalpha.csv") # gli edge della rete
+
+    nx_graph = nx.from_pandas_edgelist(net_df, source = "source", target = "target")
     # creazione grafo vuoto con networkx 
-    nx_graph = nx.Graph()
+    
+    print(nx_graph)
 
     # print(net_graph.GetEdges())
     # print(net_graph.GetNodes())
     # riempimento grafo
-    for edge in net_graph.Edges():
-        nx_graph.add_edge(edge.GetSrcNId(), edge.GetDstNId())
+    # for edge in nx_graph.Edges():
+        # nx_graph.add_edge(edge.GetSrcNId(), edge.GetDstNId())
 
     # assegnazione costi in base alla funzione scelta
     COSTS = {}
@@ -41,8 +45,9 @@ def create_graph(cost_func, is_wtss):
         COSTS = {node: random.randint(1, 10) for node in nx_graph.nodes()}
     elif cost_func == 1: # degree\2
         COSTS = {node: nx_graph.degree(node)/2 for node in nx_graph.nodes()}
-    elif cost_func == 2: # pagerank 
-        COSTS = {}
+    elif cost_func == 2: # closeness centrality
+        closeness_centrality = nx.closeness_centrality(nx_graph)
+        COSTS = {node: (round(closeness_centrality[node], 1) * 10) for node in nx_graph.nodes()}
 
     TRESHOLDS = {}    
     if is_wtss:
@@ -91,14 +96,16 @@ def influence_diffusion(GRAPH, SEED_SET):
 
 # main function
 def main():
-    budget = 50
+    budget = 200
     print("Budget: " + str(budget))
     
-    GRAPH, COSTS, TRESHOLDS = create_graph(0, TRUE)
-    SEED_SET = wtss(GRAPH, COSTS,TRESHOLDS, budget)
+    GRAPH, COSTS, TRESHOLDS = create_graph(2, False)
+    print("Individuazione seed set")
+    
+    SEED_SET = my_seeds(GRAPH, COSTS, budget)
 
-    # print("Seed set: ")
-    # print(SEED_SET)
+    #print("Seed set: ")
+    #print(SEED_SET)
     print("Dimensione seed set: " + str(len(SEED_SET)))
 
     # INFS nodi influenzati

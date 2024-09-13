@@ -33,14 +33,11 @@ def cost_seeds_greedy(graph, costs, budget):
     graph_set = set(graph.nodes())
     Sp = set()
     Sd = set()
+    discard = set()
     used_budget = 0
     
     while True:
         u = max(graph_set.difference(Sd), key=lambda v:  objective_function(graph, Sd, v) / costs[v])
-                   
-        if objective_function(graph, Sd, u) <= 0:
-            print("break")
-            break
             
         if sum(costs[v] for v in Sd) + costs[u] <= budget:
                 
@@ -52,7 +49,6 @@ def cost_seeds_greedy(graph, costs, budget):
                 # print(Sd)
         else:
             # nodi scartati dal seed set
-            discard = set()
             discard.add(u)
             graph_set = graph_set.difference(discard)
         
