@@ -23,7 +23,7 @@ from wtss import wtss
 def create_graph(cost_func, is_wtss):
     # parametri: tipo di grafo da generare, file rete, colonna source vertex
     # colonna destination vertex, separatore
-    net_graph = snap.LoadEdgeList(snap.TUNGraph, "data/musae_git_edges.csv", 0, 1, ",")
+    net_graph = snap.LoadEdgeList(snap.TUNGraph, "data/github_social_network.csv", 0, 1, ",")
     # creazione grafo vuoto con networkx 
     nx_graph = nx.Graph()
 
@@ -42,7 +42,7 @@ def create_graph(cost_func, is_wtss):
     elif cost_func == 1: # degree\2
         COSTS = {node: nx_graph.degree(node)/2 for node in nx_graph.nodes()}
     elif cost_func == 2: # pagerank 
-        break
+        COSTS = {}
 
     TRESHOLDS = {}    
     if is_wtss:
@@ -79,7 +79,7 @@ def influence_diffusion(GRAPH, SEED_SET):
             break
 
         # Aggiorna inf_s con l'insieme di nodi influenzati al passo corrente
-        INFLUENCED.add(current_influenced)
+        INFLUENCED = INFLUENCED.union(current_influenced)
         prev_influenced = prev_influenced.union(current_influenced)
         # Aggiorna il numero totale di nodi influenzati
         total_influenced += len(current_influenced)  
@@ -94,8 +94,13 @@ def main():
     budget = 50
     print("Budget: " + str(budget))
     
-    GRAPH, COSTS, TRESHOLDS = create_graph(0, False)
-    SEED_SET = my_seeds(GRAPH, COSTS, budget)
+    GRAPH, COSTS, TRESHOLDS = create_graph(0, TRUE)
+    SEED_SET = wtss(GRAPH, COSTS,TRESHOLDS, budget)
+
+    # print("Seed set: ")
+    # print(SEED_SET)
+    print("Dimensione seed set: " + str(len(SEED_SET)))
+
     # INFS nodi influenzati
     INFS, INFLUENCED = influence_diffusion(GRAPH, SEED_SET)
     print("Totale nodi influenzati: " + str(INFLUENCED))

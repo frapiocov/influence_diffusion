@@ -10,6 +10,10 @@ from collections import Counter
 
 def wtss(GRAPH, COSTS, TRESHOLDS, budget):
     # copia del grafo su cui effettuare il processo
+    print("nodes: ", str(len(GRAPH)))
+    print("nodes: ", str(len(COSTS)))
+    print("nodes: ", str(len(TRESHOLDS)))
+    
     graph_copy = GRAPH;
     seed_set = []
     seed_set_cost = 0
@@ -37,7 +41,7 @@ def wtss(GRAPH, COSTS, TRESHOLDS, budget):
             continue
 
         # SECONDO CASO
-        for v in G_copy.nodes():
+        for v in graph_copy.nodes():
             if graph_copy.degree(v) < TRESHOLDS[v]:
                 second_case_flag = True
                 # v viene aggiunto al seed set
@@ -64,8 +68,8 @@ def wtss(GRAPH, COSTS, TRESHOLDS, budget):
             cost = COSTS[v]
             threshold = TRESHOLDS[v]
             degree = graph_copy.degree(v)
-
-            selected_nodes[v] = ((cost * threshold) / (degree * (degree + 1)))
+            if degree != 0:
+                selected_nodes[v] = ((cost * threshold) / (degree * (degree + 1)))
         #scelta del nodo da rimuovere
         to_delete = max(selected_nodes, key=selected_nodes.get)
         graph_copy.remove_node(to_delete)
