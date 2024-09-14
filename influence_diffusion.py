@@ -15,6 +15,7 @@ import math
 import networkx as nx
 import random
 import pandas as pd
+import matplotlib.pyplot as plt
 
 from my_seeds import my_seeds
 from cost_seeds_greedy import cost_seeds_greedy
@@ -92,6 +93,8 @@ def influence_diffusion(GRAPH, SEED_SET):
 
     return INFLUENCED, total_influenced
 
+def draw_graph(GRAPH):
+    nx.draw(GRAPH)
 
 
 # main function
@@ -103,7 +106,7 @@ def main():
     print("Individuazione seed set")
     
     SEED_SET = my_seeds(GRAPH, COSTS, budget)
-
+    draw_graph(GRAPH)
     #print("Seed set: ")
     #print(SEED_SET)
     print("Dimensione seed set: " + str(len(SEED_SET)))
